@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>李杰的主页</title>
+    <link rel="icon" type="image/x-icon" href="https://ts1.tc.mm.bing.net/th/id/R-C.eff8fed2d2e1f66139efcc816383c99d?rik=mQ4EJyy8bqupuA&riu=http%3a%2f%2f5b0988e595225.cdn.sohucs.com%2fimages%2f20181229%2fa6f2ccb89c31489ba1e6c6db9545858e.jpeg&ehk=7UEU2AmRdz7vKmZcWBX2UNkRkwRQcxNG1NgE4%2bX%2fMEw%3d&risl=&pid=ImgRaw&r=0">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 50px 0;
+            font-family: Arial;
+        }
+        #keyword {
+            width: 600px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 24px;
+        }
+        .platforms {
+            margin-top: 30px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 800px;
+        }
+        .platforms img {
+            width: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .platforms img:hover {
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <h2>多重搜索</h2>
+    <input type="text" id="keyword" placeholder="输入搜索内容">
+    <div class="platforms" id="platforms"></div>
+
+    <script>
+        // 更新后的搜索引擎配置
+        const engines = [
+            {
+                name: '必应',
+                icon: 'https://www.bing.com/favicon.ico',
+                search: 'https://www.bing.com/search?q=',
+                home: 'https://www.bing.com/'
+            },
+            {
+                name: '联合早报',
+                icon: 'https://ts1.tc.mm.bing.net/th/id/OIP-C.VNRHO0xhZFINoUNRHI1DsAHaHa?cb=iwc2&rs=1&pid=ImgDetMain',
+                search: 'https://www.zaobao.com/search-result?k=',
+                home: 'https://www.zaobao.com/'
+            },
+            {
+                name: '网易公开课',
+                icon: 'https://ts4.tc.mm.bing.net/th/id/OIP-C.4-jE-8-A0chZTgWp_e_I8AAAAA?cb=iwc2&rs=1&pid=ImgDetMain',
+                search: 'https://open.163.com/newview/search/',
+                home: 'https://open.163.com/'
+            },
+            {   // 调整后的B站位置
+                name: '哔哩哔哩',
+                icon: 'https://ts1.tc.mm.bing.net/th/id/R-C.9302b4c34fa5c6c0c0acca650f58e14c?rik=GkMtOiafXNMSZA&riu=http%3a%2f%2fpic.downyi.com%2fupload%2f2017-6%2f2017611150425410.png&ehk=GnGINfxXLtzNz%2boduOhLMt2C9bvz%2fyrQtgOFhSEZBeQ%3d&risl=&pid=ImgRaw&r=0',
+                search: 'https://search.bilibili.com/all?keyword=',
+                home: 'https://www.bilibili.com/'
+            },
+            {   // 调整后的抖音位置
+                name: '抖音',
+                icon: 'https://lf1-cdn-tos.bytegoofy.com/goofy/ies/douyin_web/public/favicon.ico',
+                search: 'https://www.douyin.com/search/',
+                home: 'https://www.douyin.com/'
+            },
+            {
+                name: '豆瓣电影',
+                icon: 'https://www.douban.com/favicon.ico',
+                search: 'https://movie.douban.com/subject_search?search_text=',
+                home: 'https://movie.douban.com/'
+            },
+              {
+                name: '雪球',
+                icon: 'https://xueqiu.com/favicon.ico',
+                search: 'https://xueqiu.com/k?q=',
+                home: 'https://xueqiu.com/'
+            },
+            {
+                name: '高德地图',
+                icon: 'https://ditu.amap.com/favicon.ico',
+                search: 'https://ditu.amap.com/search?query=',
+                home: 'https://ditu.amap.com/'
+            },
+            {
+                name: '易搜索',
+                icon: 'https://www.esoua.com/favicon.ico',
+                search: 'https://www.esoua.com/search?q=',
+                home: 'https://www.esoua.com/'
+            },
+            {
+                name: '淘宝',
+                icon: 'https://www.taobao.com/favicon.ico',
+                search: 'https://s.taobao.com/search?q=',
+                home: 'https://www.taobao.com/'
+            },
+            {
+                name: '京东',
+                icon: 'https://www.jd.com/favicon.ico',
+                search: 'https://search.jd.com/Search?keyword=',
+                home: 'https://www.jd.com/'
+            }
+        ];
+
+        // 自动生成图标（保持不变）
+        function init() {
+            const container = document.getElementById('platforms');
+            engines.forEach(engine => {
+                const img = document.createElement('img');
+                img.src = engine.icon;
+                img.title = engine.name;
+                img.onclick = () => search(engine);
+                container.appendChild(img);
+            });
+        }
+
+        // 统一搜索处理（保持不变）
+        function search(engine) {
+            const keyword = document.getElementById('keyword').value.trim();
+            const url = keyword ? 
+                `${engine.search}${encodeURIComponent(keyword)}` : 
+                engine.home;
+            window.open(url, '_blank');
+        }
+
+        // 初始化页面
+        init();
+    </script>
+</body>
+</html>
