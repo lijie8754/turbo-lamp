@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>天气</title>
+<style>
+#w{width:300px}
+table{width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed}
+td,th{padding:4px 0;text-align:center}
+col.c1{width:60px}
+col.c2{width:80px}
+col.c3{width:80px}
+col.c4{width:80px}
+canvas{width:300px;height:150px}
+</style>
+</head>
+<body>
+<h1>苏州天气</h1>
+<div id="w"></div>
+<script>
+fetch('https://wttr.in/苏州?format=j1').then(r=>r.json()).then(d=>{
+    const week = ['周日','周一','周二','周三','周四','周五','周六'];
+    const days = d.weather.slice(0,3);
+    let html = '<table><col class="c1"><col class="c2"><col class="c3"><col class="c4"><tr><td></td>';
+    days.forEach(day=>{
+        const dt = new Date(day.date);
+        html += '<td><b>'+day.date.slice(5).replace(/-/g,'/')+'</b><br>'+week[dt.getDay()]+'</td>';
+    });
+    html += '</tr><tr><td></td>';
+    days.forEach(day=>{
+        const iconUrl = day.hourly[4].weatherIconUrl[0].value;
+        html += '<td>'+(iconUrl&&iconUrl!=='miss'?'<img src="'+iconUrl+'" width="30">':'')+'</td>';
+    });
+    html += '</tr></table><canvas id="c" width="300" height="150"></canvas>';
+    document.getElementById('w').innerHTML = html;
+    const highs = days.map(day=>+day.maxtempC);
+    const lows = days.map(day=>+day.mintempC);
+    const all = highs.concat(lows);
+    const min = Math.min(...all)-3;
+    const max = Math.max(...all)+3;
+    const c = document.getElementById('c');
+    const ctx = c.getContext('2d');
+    const xs = [100, 180, 260];
+    function drawLine(data, color, label, yOff){
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        data.forEach((v,i)=>{
+            const y = 10+60-(v-min)/(max-min)*60+(yOff||0);
+            i===0?ctx.moveTo(xs[i],y):ctx.lineTo(xs[i],y);
+        });
+        ctx.stroke();
+        data.forEach((v,i)=>{
+            const y = 10+60-(v-min)/(max-min)*60+(yOff||0);
+            ctx.beginPath();
+            ctx.fillStyle = color;
+            ctx.arc(xs[i],y,3,0,Math.PI*2);
+            ctx.fill();
+            ctx.fillStyle = color;
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(v+'°',xs[i],y-8);
+        });
+        ctx.fillStyle = color;
+        ctx.font = 'bold 14px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(label,5,10+60-(data[0]-min)/(max-min)*60+(yOff||0));
+    }
+    drawLine(highs,'#e74c3c','最高温');
+    drawLine(lows,'#3498db','最低温',50);
+});
+</script>
+</body>
+</html>

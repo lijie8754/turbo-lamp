@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    #bg{position:fixed;inset:0;background:center/cover no-repeat}
+    /* 玻璃效果类 - 可复用 */
+    .glass-effect{
+        background:rgba(255,255,255,0.15);
+        backdrop-filter:blur(20px);
+        border-radius:20px;
+        border:1px solid rgba(255,255,255,0.3);
+        box-shadow: 
+            inset 0 0 20px rgba(255,255,255,0.2),
+            0 8px 32px rgba(0,0,0,0.15);
+        overflow:hidden;
+    }
+    #glass{
+        position:fixed;
+        top:20%;
+        left:50%;
+        transform:translate(-50%,-50%);
+        width:500px;
+        height:200px;
+    }
+</style>
+</head>
+<body>
+<div id="bg"></div>
+<div id="glass" class="glass-effect"></div>
+<script>
+    const bg = document.getElementById('bg');
+    const today = new Date().toDateString();
+    
+    if (localStorage.bd === today) {
+        bg.style.backgroundImage = `url(${localStorage.bu})`;
+    } else {
+        fetch('https://bing.biturl.top/?resolution=3840&format=json&index=0&mkt=zh-CN')
+            .then(r => r.json())
+            .then(d => {
+                localStorage.bd = today;
+                localStorage.bu = d.url;
+                bg.style.backgroundImage = `url(${d.url})`;
+            })
+            .catch(() => {});
+    }
+</script>
+</body>
+</html>
