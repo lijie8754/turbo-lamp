@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>琉璃坞</title>
+    <style>
+        /* 背景图 - 全屏显示必应美图 */
+        #bg {
+            position: fixed;
+            inset: 0;
+            background: center/cover no-repeat;
+        }
+        
+        /* 玻璃卡片效果 - 毛玻璃透明效果 */
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.2), 0 8px 32px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        /* 卡片1居中 - 水平垂直居中（上移25px） */
+        #glass {
+            position: fixed;
+            top: calc(50% - 125px);
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 660px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 28px 30px 30px 30px;
+        }
+        
+        /* 卡片2居中 - 放在glass下面 */
+        #glass2 {
+            position: fixed;
+            top: calc(50% + 115px);
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 660px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 28px 30px 30px 30px;
+        }
+        
+        /* 搜索区域布局 - 搜索框和清除按钮在同一行居中 */
+        .search-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        
+        /* 搜索框样式 */
+        #searchInput {
+            flex: 1;
+            max-width: 400px;
+            padding: 10px 16px;
+            font-size: 18px;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(4px);
+            color: #fff;
+            outline: none;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        
+        /* 搜索框提示文字 - "搜索..."灰蒙蒙的效果 */
+        #searchInput::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        /* 搜索框被选中时 - 背景变浅+周围白光圈 */
+        #searchInput:focus {
+            background: rgba(255, 255, 255, 0.35);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+        }
+
+        /* 公共按钮样式 - 鼠标放上去会变亮和微微变大 */
+        .btn-base {
+            margin: 4px 3px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+            cursor: pointer;
+            transition: 0.15s;
+            vertical-align: middle;
+            color: #fff;
+        }
+        .btn-base:hover {
+            background: rgba(255, 255, 255, 0.4);  /* 背景变亮 */
+            transform: scale(1.05);  /* 微微变大 */
+        }
+
+        /* 图标按钮尺寸 - 只放图标，窄一点 */
+        .icon-btn {
+            padding: 6px 8px;
+            font-size: 20px;
+            line-height: 1;
+        }
+        .icon-btn img {
+            display: block;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            object-fit: contain;
+        }
+
+        /* 清除按钮尺寸 - 要写"清除"两个字，所以宽一点 */
+        .clear-btn {
+            padding: 6px 14px;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.4;
+            flex-shrink: 0;
+        }
+
+        /* 按钮容器 - 让按钮能换行且居中 */
+        .btn-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 4px 2px;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div id="bg"></div>
+    <div id="glass" class="glass-effect">
+
+        <!-- 搜索框 + 清除按钮 整体居中 -->
+        <div class="search-wrapper">
+            <input type="text" id="searchInput" placeholder="搜索..." autofocus>
+            <button class="btn-base clear-btn" onclick="clearSearch()">清除</button>
+        </div>
+
+        <div class="btn-wrap">
+            <button id="btn0" class="btn-base icon-btn" onclick="go(0)"></button>
+            <button id="btn1" class="btn-base icon-btn" onclick="go(1)"></button>
+            <button id="btn2" class="btn-base icon-btn" onclick="go(2)"></button>
+            <button id="btn3" class="btn-base icon-btn" onclick="go(3)"></button>
+            <button id="btn4" class="btn-base icon-btn" onclick="go(4)"></button>
+            <button id="btn5" class="btn-base icon-btn" onclick="go(5)"></button>
+            <button id="btn6" class="btn-base icon-btn" onclick="go(6)"></button>
+            <button id="btn7" class="btn-base icon-btn" onclick="go(7)"></button>
+            <button id="btn8" class="btn-base icon-btn" onclick="go(8)"></button>
+            <button id="btn9" class="btn-base icon-btn" onclick="go(9)"></button>
+            <button id="btn10" class="btn-base icon-btn" onclick="go(10)"></button>
+            <button id="btn11" class="btn-base icon-btn" onclick="go(11)"></button>
+            <button id="btn12" class="btn-base icon-btn" onclick="go(12)"></button>
+            <button id="btn13" class="btn-base icon-btn" onclick="go(13)"></button>
+            <button id="btn14" class="btn-base icon-btn" onclick="go(14)"></button>
+            <button id="btn15" class="btn-base icon-btn" onclick="go(15)"></button>
+            <button id="btn16" class="btn-base icon-btn" onclick="go(16)"></button>
+        </div>
+
+        <script>
+            // ===== 网站配置 =====
+            var sites = [{
+                name: 'Bing',
+                icon: 'https://www.bing.com/favicon.ico',
+                url: 'https://www.bing.com',
+                searchUrl: 'https://www.bing.com/search?q='
+            }, {
+                name: '联合早报',
+                icon: 'https://ts1.tc.mm.bing.net/th/id/OIP-C.VNRHO0xhZFINoUNRHI1DsAHaHa?cb=iwc2&rs=1&pid=ImgDetMain',
+                url: 'https://www.zaobao.com/',
+                searchUrl: 'https://www.zaobao.com/search-result?k='
+            }, {
+                name: '抖音',
+                icon: 'https://www.douyin.com/favicon.ico',
+                url: 'https://www.douyin.com',
+                searchUrl: 'https://www.douyin.com/search/'
+            }, {
+                name: 'Bilibili',
+                icon: 'https://www.bilibili.com/favicon.ico',
+                url: 'https://www.bilibili.com',
+                searchUrl: 'https://search.bilibili.com/all?keyword='
+            }, {
+                name: '网易公开课',
+                icon: 'https://ts4.tc.mm.bing.net/th/id/OIP-C.4-jE-8-A0chZTgWp_e_I8AAAAA?cb=iwc2&rs=1&pid=ImgDetMain',
+                url: 'https://open.163.com/',
+                searchUrl: 'https://open.163.com/newview/search/'
+            }, {
+                name: '淘宝',
+                icon: 'https://www.taobao.com/favicon.ico',
+                url: 'https://www.taobao.com/',
+                searchUrl: 'https://s.taobao.com/search?q='
+            }, {
+                name: '京东',
+                icon: 'https://www.jd.com/favicon.ico',
+                url: 'https://www.jd.com/',
+                searchUrl: 'https://search.jd.com/Search?keyword='
+            }, {
+                name: '豆瓣电影',
+                icon: 'data:image/x-icon;base64,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AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP+RwIn////////////4+/j/GnwK/xF3AP8RdwD/EXcA/xF3AP8afAr/+Pv4////////////kcCJ/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/9Xn0v///////////77auf8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP++2rn////////////V59L/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8rhhz/////////////////erNw/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/3qzcP////////////////8rhhz/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/26sZP////////////////81jCf/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/NYwn/////////////////26sZP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/vdm4////////////5PDi/y+IIP8viCD/L4gg/y+IIP8viCD/L4gg/y+IIP8viCD/5PDi////////////vdm4/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/0+bQ/////////////////////////////////////////////////////////////////////////////////////////////////9Pm0P8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP/T5tD/////////////////////////////////////////////////////////////////////////////////////////////////0+bQ/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/9Pm0P///////////9vq2P+Iu4D/iLuA/4i7gP+Iu4D/iLuA/4i7gP+Iu4D/iLuA/4i7gP+Iu4D/iLuA/4i7gP/b6tj////////////T5tD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/0+bQ////////////tdWw/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/7XVsP///////////9Pm0P8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP/T5tD///////////+11bD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/tdWw////////////0+bQ/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/9Pm0P///////////7XVsP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP+11bD////////////T5tD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/0+bQ////////////tdWw/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/7XVsP///////////9Pm0P8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP/T5tD////////////b6tj/iLuA/4i7gP+Iu4D/iLuA/4i7gP+Iu4D/iLuA/4i7gP+Iu4D/iLuA/4i7gP+Iu4D/2+rY////////////0+bQ/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/9Pm0P/////////////////////////////////////////////////////////////////////////////////////////////////T5tD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/0+bQ/////////////////////////////////////////////////////////////////////////////////////////////////9Pm0P8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/+Lu4P//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////4u7g/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/4u7g///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////i7uD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP/i7uD//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////+Lu4P8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AOYRdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwDmEXcASRF3AOYRdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA/xF3AP8RdwD/EXcA5hF3AEkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==',
+                url: 'https://movie.douban.com/',
+                searchUrl: 'https://movie.douban.com/subject_search?search_text='
+            }, {
+                name: '菜鸟教程',
+                icon: 'https://www.runoob.com/favicon.ico',
+                url: 'https://www.runoob.com/',
+                searchUrl: 'https://www.runoob.com/?s='
+            }, {
+                name: '网易云音乐',
+                icon: 'https://music.163.com/favicon.ico',
+                url: 'https://music.163.com/',
+                searchUrl: 'https://music.163.com/#/search/m/?s='
+            }, {
+                name: '高德地图',
+                icon: 'https://ditu.amap.com/favicon.ico',
+                url: 'https://ditu.amap.com/',
+                searchUrl: 'https://ditu.amap.com/search?query='
+            }, {
+                name: '语雀',
+                icon: 'https://mdn.alipayobjects.com/huamei_0prmtq/afts/img/A*vMxOQIh4KBMAAAAAAAAAAAAADvuFAQ/original',
+                url: 'https://www.yuque.com/dashboard',
+                searchUrl: 'https://www.yuque.com/search?q='
+            }, {
+                name: '雪球',
+                icon: 'https://xueqiu.com/favicon.ico',
+                url: 'https://xueqiu.com/',
+                searchUrl: 'https://xueqiu.com/k?q='
+            }, {
+                name: '好买基金',
+                icon: 'https://www.howbuy.com/favicon.ico',
+                url: 'https://www.howbuy.com/',
+                searchUrl: 'https://www.howbuy.com/search/quicksearch.htm?skey='
+            }, {
+                name: '阿里云盘',
+                icon: 'https://www.alipan.com/favicon.ico',
+                url: 'https://www.alipan.com/drive/home',
+                searchUrl: 'https://www.alipan.com/drive/search?query='
+            }, {
+                name: '易搜索',
+                icon: 'https://www.esoua.com/favicon.ico',
+                url: 'https://www.esoua.com/',
+                searchUrl: 'https://www.esoua.com/search?q='
+            }, {
+                name: '汽车之家',
+                icon: 'https://icon.horse/icon/autohome.com.cn',
+                url: 'https://www.autohome.com.cn/suzhou/?from=m',
+                searchUrl: 'https://sou.autohome.com.cn/zonghe?entry=42&error=0&pvareaid=6861421&mq=&charset=utf8&q='
+            }];
+
+            for (var i = 0; i < sites.length; i++) {
+                var btn = document.getElementById('btn' + i);
+                if (btn) {
+                    btn.innerHTML = '<img src="' + sites[i].icon + '" width="28" height="28" loading="lazy" alt="">';
+                }
+            }
+
+            function go(index) {
+                var site = sites[index];
+                if (!site) return;
+                var v = document.getElementById('searchInput').value.trim();
+                window.open(v ? site.searchUrl + encodeURIComponent(v) : site.url, '_blank');
+            }
+
+            function clearSearch() {
+                var i = document.getElementById('searchInput');
+                if (i) {
+                    i.value = '';
+                    i.focus();
+                }
+            }
+
+            document.getElementById('searchInput').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    go(0);
+                }
+            });
+        </script>
+
+    </div>
+
+    <!-- 第二个玻璃面板 -->
+    <div id="glass2" class="glass-effect">
+        <div class="btn-wrap">
+            <!-- 第一排：生活类 -->
+            <a class="btn-base icon-btn" href="https://mail.qq.com/" target="_blank" title="QQ邮箱">
+                <img src="https://mail.qq.com/favicon.ico" width="28" height="28" loading="lazy" alt="QQ邮箱">
+            </a>
+            <a class="btn-base icon-btn" href="https://outlook.live.com/mail/" target="_blank" title="Outlook">
+                <img src="https://outlook.live.com/favicon.ico" width="28" height="28" loading="lazy" alt="Outlook">
+            </a>
+            <a class="btn-base icon-btn" href="https://www.12306.cn/index/" target="_blank" title="12306">
+                <img src="https://www.12306.cn/index/images/favicon.ico" width="28" height="28" loading="lazy" alt="12306">
+            </a>
+            <a class="btn-base icon-btn" href="https://www.ctrip.com/" target="_blank" title="携程">
+                <img src="https://www.ctrip.com/favicon.ico" width="28" height="28" loading="lazy" alt="携程">
+            </a>
+            <a class="btn-base icon-btn" href="https://weread.qq.com/" target="_blank" title="微信读书">
+                <img src="https://weread.qq.com/favicon.ico" width="28" height="28" loading="lazy" alt="微信读书">
+            </a>
+            <a class="btn-base icon-btn" href="https://www.tesla.cn/model3" target="_blank" title="Tesla Model 3">
+                <img src="https://icon.horse/icon/tesla.cn" width="28" height="28" loading="lazy" alt="Tesla">
+            </a>
+            <a class="btn-base icon-btn" href="https://www.skylinewebcams.com/" target="_blank" title="SkylineWebcams">
+                <img src="https://www.skylinewebcams.com/favicon.ico" width="28" height="28" loading="lazy" alt="SkylineWebcams">
+            </a>
+            <a class="btn-base icon-btn" href="https://liveuamap.com/" target="_blank" title="Liveuamap">
+                <img src="https://icon.horse/icon/liveuamap.com" width="28" height="28" loading="lazy" alt="Liveuamap">
+            </a>
+            <a class="btn-base icon-btn" href="https://www.toolbay.cc/history-map/index.html" target="_blank" title="ToolBay 历史地图">
+                <img src="https://www.toolbay.cc/favicon.ico" width="28" height="28" loading="lazy" alt="ToolBay">
+            </a>
+            <a class="btn-base icon-btn" href="https://www.radiocast.co/" target="_blank" title="RadioCast">
+                <img src="https://www.radiocast.co/favicon.ico" width="28" height="28" loading="lazy" alt="RadioCast">
+            </a>
+            <div style="flex-basis:100%;height:0"></div>
+            <!-- 第二排：投资·房产类 -->
+            <a class="btn-base icon-btn" href="https://www.ke.com/?freeze=1&eqid=88b7168b000c97ad0000000664782e4b" target="_blank" title="贝壳找房">
+                <img src="https://www.ke.com/favicon.ico" width="28" height="28" loading="lazy" alt="贝壳找房">
+            </a>
+            <a class="btn-base icon-btn" href="https://buildingjp.com/" target="_blank" title="BuildingJP">
+                <img src="https://buildingjp.com/assets/image/house_logo.png" width="28" height="28" loading="lazy" alt="BuildingJP">
+            </a>
+            <a class="btn-base icon-btn" href="https://www.jisilu.cn/" target="_blank" title="集思录">
+                <img src="https://www.jisilu.cn/favicon.ico" width="28" height="28" loading="lazy" alt="集思录">
+            </a>
+            <a class="btn-base icon-btn" href="https://guorn.com/stock/query/" target="_blank" title="果仁网">
+                <img src="https://guorn.com/favicon.ico" width="28" height="28" loading="lazy" alt="果仁网">
+            </a>
+            <a class="btn-base icon-btn" href="https://52etf.site/" target="_blank" title="52ETF">
+                <img src="https://52etf.site/favicon.ico" width="28" height="28" loading="lazy" alt="52ETF">
+            </a>
+            <div style="flex-basis:100%;height:0"></div>
+            <!-- 第三排：科技类 -->
+            <a class="btn-base icon-btn" href="https://chat.deepseek.com/" target="_blank" title="DeepSeek">
+                <img src="https://cdn.deepseek.com/chat/icon.png" width="28" height="28" loading="lazy" alt="DeepSeek">
+            </a>
+            <a class="btn-base icon-btn" href="https://www.kimi.com/zh/" target="_blank" title="Kimi">
+                <img src="https://www.kimi.com/favicon.ico" width="28" height="28" loading="lazy" alt="Kimi">
+            </a>
+            <a class="btn-base icon-btn" href="https://github.com/" target="_blank" title="GitHub">
+                <img src="https://github.com/favicon.ico" width="28" height="28" loading="lazy" alt="GitHub">
+            </a>
+            <a class="btn-base icon-btn" href="https://openrouter.ai/" target="_blank" title="OpenRouter">
+                <img src="https://openrouter.ai/favicon.ico" width="28" height="28" loading="lazy" alt="OpenRouter">
+            </a>
+            <a class="btn-base icon-btn" href="https://build.nvidia.com/models" target="_blank" title="NVIDIA Build">
+                <img src="https://build.nvidia.com/favicon.ico" width="28" height="28" loading="lazy" alt="NVIDIA Build">
+            </a>
+            <a class="btn-base icon-btn" href="https://console.sqlpub.com/dashboard/overview" target="_blank" title="SQLPub">
+                <img src="https://console.sqlpub.com/favicon.ico" width="28" height="28" loading="lazy" alt="SQLPub">
+            </a>
+            <a class="btn-base icon-btn" href="https://railway.com/" target="_blank" title="Railway">
+                <img src="https://railway.com/favicon.ico" width="28" height="28" loading="lazy" alt="Railway">
+            </a>
+            <a class="btn-base icon-btn" href="https://render.com/" target="_blank" title="Render">
+                <img src="https://icon.horse/icon/render.com" width="28" height="28" loading="lazy" alt="Render">
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const bg = document.getElementById('bg');
+        const today = new Date().toDateString();
+
+        if (localStorage.bd === today) {
+            bg.style.backgroundImage = 'url(' + localStorage.bu + ')';
+        } else {
+            fetch('https://bing.biturl.top/?resolution=3840&format=json&index=0&mkt=zh-CN')
+                .then(function(r) { return r.json(); })
+                .then(function(d) {
+                    localStorage.bd = today;
+                    localStorage.bu = d.url;
+                    bg.style.backgroundImage = 'url(' + d.url + ')';
+                })
+                .catch(function() {});
+        }
+    </script>
+</body>
+</html>
