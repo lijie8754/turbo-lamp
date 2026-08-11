@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>股票指数涨跌幅</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 8px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 380px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 14px;
+            margin: 3px 0 8px 0;
+        }
+        .chart-item {
+            background: white;
+            padding: 6px;
+            margin-bottom: 6px;
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+        }
+        .chart-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3px;
+            font-size: 11px;
+        }
+        .chart-name {
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .chart-info {
+            font-size: 11px;
+        }
+        .up { color: #d9534f; }
+        .down { color: #5cb85c; }
+        canvas {
+            width: 100%;
+            height: 110px;
+            display: block;
+        }
+        .last-update {
+            text-align: center;
+            color: #999;
+            font-size: 10px;
+            margin-top: 4px;
+        }
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>股票指数涨跌幅</h1>
+        <div id="charts">
+            <div class="loading">加载中...</div>
+        </div>
+        <div class="last-update" id="update-time">最后更新时间: --</div>
+    </div>
+
+    <script>
+        const stocks = [
+            { code: 'sh000001', name: '上证指数' },
+            { code: 'sz399001', name: '深证成指' },
+            { code: 'sz399006', name: '创业板指' }
+        ];
+
+        async function fetchMinuteData(code) {
+            const r = await fetch(`https://web.ifzq.gtimg.cn/appstock/app/minute/query?code=${code}`);
+            const j = await r.json();
+            const dataObj = j.data[code].data;
+            return { data: dataObj.data, date: dataObj.date };
+        }
+
+        async function fetchQuote(code) {
+            const r = await fetch(`https://qt.gtimg.cn/q=${code}`);
+            const t = await r.text();
+            const m = t.match(/"([^"]*)"/);
+            if (m) {
+                const v = m[1].split('~');
+                return { price: v[3], change: v[31], percent: v[32], yesterdayClose: v[4] };
+            }
+            return null;
+        }
+
+        function drawChart(canvas, data, quote, isUp, yRange) {
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+
+            const w = rect.width, h = rect.height;
+            const pl = 42, pr = 30, pt = 5, pb = 18;
+            const cw = w - pl - pr, ch = h - pt - pb;
+            const totalMin = 240;
+
+            // 过滤交易时间，同时计算涨跌幅
+            const points = [];
+            data.forEach(d => {
+                const p = d.split(' ');
+                const minutes = parseInt(p[0].substring(0,2)) * 60 + parseInt(p[0].substring(2,4));
+                if ((minutes >= 570 && minutes <= 690) || (minutes >= 780 && minutes <= 900)) {
+                    points.push({ price: parseFloat(p[1]), minutes });
+                }
+            });
+            if (points.length === 0) return;
+
+            const base = parseFloat(quote.yesterdayClose);
+            const changes = points.map(p => (p.price - base) / base * 100);
+
+            ctx.clearRect(0, 0, w, h);
+
+            const color = isUp ? '#d9534f' : '#5cb85c';
+
+            // 网格 + Y轴标签
+            ctx.strokeStyle = '#eee';
+            ctx.lineWidth = 0.3;
+            [1, 0.5, 0, -0.5, -1].forEach((ratio, i) => {
+                const y = pt + (ch / 4) * i;
+                ctx.beginPath();
+                ctx.moveTo(pl, y);
+                ctx.lineTo(w - pr, y);
+                ctx.stroke();
+                const v = (yRange / 2) * ratio;
+                ctx.fillStyle = '#999';
+                ctx.font = '9px Arial';
+                ctx.textAlign = 'right';
+                ctx.fillText(v >= 0 ? `+${v.toFixed(2)}%` : `${v.toFixed(2)}%`, pl - 3, y + 3);
+            });
+
+            // 零轴
+            const zeroY = pt + ch / 2;
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(pl, zeroY);
+            ctx.lineTo(w - pr, zeroY);
+            ctx.stroke();
+
+            // X轴时间
+            const xLabels = ['09:30', '10:30', '11:30', '14:00', '15:00'];
+            const xPositions = [0, 60, 120, 180, 240];
+            ctx.fillStyle = '#999';
+            ctx.font = '9px Arial';
+            ctx.textAlign = 'center';
+            xPositions.forEach((min, i) => {
+                ctx.fillText(xLabels[i], pl + (min / totalMin) * cw, h - pb + 10);
+            });
+
+            function getX(minutes) {
+                return minutes <= 690
+                    ? pl + ((minutes - 570) / totalMin) * cw
+                    : pl + ((120 + (minutes - 780)) / totalMin) * cw;
+            }
+
+            const yScale = ch / yRange;
+
+            // 折线 + 填充（合并为一次遍历）
+            const grad = ctx.createLinearGradient(0, pt, 0, h - pb);
+            grad.addColorStop(0, color + '20');
+            grad.addColorStop(1, color + '02');
+
+            ctx.beginPath();
+            points.forEach((p, i) => {
+                const x = getX(p.minutes);
+                const y = zeroY - changes[i] * yScale;
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            });
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // 填充区域
+            const lastX = getX(points[points.length-1].minutes);
+            const firstX = getX(points[0].minutes);
+            ctx.lineTo(lastX, zeroY);
+            ctx.lineTo(firstX, zeroY);
+            ctx.closePath();
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // 最新值圆点
+            const lp = points[points.length-1];
+            const lx = getX(lp.minutes);
+            const ly = zeroY - changes[changes.length-1] * yScale;
+            ctx.beginPath();
+            ctx.arc(lx, ly, 2.5, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+        async function updateAll() {
+            const container = document.getElementById('charts');
+            container.innerHTML = '';
+
+            for (const stock of stocks) {
+                const item = document.createElement('div');
+                item.className = 'chart-item';
+                item.innerHTML = `
+                    <div class="chart-top">
+                        <span class="chart-name">${stock.name}</span>
+                        <span class="chart-info" id="info-${stock.code}">加载中...</span>
+                    </div>
+                    <canvas id="canvas-${stock.code}"></canvas>
+                `;
+                container.appendChild(item);
+            }
+
+            // 获取数据，计算统一的Y轴范围
+            const stockData = [];
+            let latestDate = '';
+            for (const stock of stocks) {
+                try {
+                    const [result, quote] = await Promise.all([
+                        fetchMinuteData(stock.code),
+                        fetchQuote(stock.code)
+                    ]);
+                    const { data, date } = result;
+                    if (date && date > latestDate) latestDate = date;
+                    stockData.push({ stock, data, quote });
+                } catch (err) {
+                    console.error(`${stock.name}失败:`, err);
+                }
+            }
+
+            let globalMaxAbs = 0.3;
+            for (const { data, quote } of stockData) {
+                if (quote && data) {
+                    const base = parseFloat(quote.yesterdayClose);
+                    const maxChange = Math.max(...data.map(d => Math.abs((parseFloat(d.split(' ')[1]) - base) / base * 100)).filter(v => !isNaN(v)));
+                    if (maxChange > globalMaxAbs) globalMaxAbs = maxChange;
+                }
+            }
+            const yRange = globalMaxAbs * 2 * 1.1;
+
+            // 绘制所有图表
+            for (const { stock, data, quote } of stockData) {
+                if (!quote) continue;
+                const el = document.getElementById(`info-${stock.code}`);
+                const cn = parseFloat(quote.change);
+                const cls = cn >= 0 ? 'up' : 'down';
+                const sign = cn >= 0 ? '+' : '';
+                el.innerHTML = `<span class="${cls}">${quote.price} ${sign}${quote.percent}%</span>`;
+
+                const canvas = document.getElementById(`canvas-${stock.code}`);
+                drawChart(canvas, data, quote, cn >= 0, yRange);
+            }
+
+            // 更新日期
+            const d = latestDate || new Date().toISOString().slice(0, 10);
+            document.getElementById('update-time').textContent = `更新日期: ${d.replace(/-/g, '/')}`;
+        }
+
+        updateAll();
+        setInterval(updateAll, 5 * 60 * 1000);
+    </script>
+</body>
+</html>
